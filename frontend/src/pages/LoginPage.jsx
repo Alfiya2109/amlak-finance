@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
 import { ShieldCheck, Lock, User, KeyRound, Smartphone, ArrowLeft, QrCode, Sparkles } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -172,11 +173,22 @@ export const LoginPage = () => {
                         <p className="text-[10px] text-slate-600 font-medium">
                           Scan QR in <strong>Microsoft Authenticator</strong> app:
                         </p>
-                        <img
-                          src={tempData.qrCodeImageDataUrl}
-                          alt="Microsoft Authenticator QR"
-                          className="w-28 h-28 mx-auto border-2 border-slate-200 rounded-lg shadow-2xs"
-                        />
+                        {tempData.twoFactorSecret ? (
+                          <div className="flex justify-center p-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs w-fit mx-auto">
+                            <QRCodeSVG 
+                              value={`otpauth://totp/AmlakFinance:${username}?secret=${tempData.twoFactorSecret}&issuer=AmlakFinance`} 
+                              size={112}
+                              level="M"
+                              includeMargin={true}
+                            />
+                          </div>
+                        ) : (
+                          <img
+                            src={tempData.qrCodeImageDataUrl}
+                            alt="Microsoft Authenticator QR"
+                            className="w-28 h-28 mx-auto border-2 border-slate-200 rounded-lg shadow-2xs"
+                          />
+                        )}
                         {tempData.twoFactorSecret && (
                           <p className="text-[10px] font-mono text-slate-500 bg-slate-50 p-1 rounded-md border border-slate-200 truncate">
                             Key: {tempData.twoFactorSecret}
