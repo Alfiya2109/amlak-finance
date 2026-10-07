@@ -15,6 +15,114 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+// Global in-memory demo store for dynamic letter uploads
+let mockLettersStore = [
+  {
+    id: 'dc14a8cf-c4a1-432b-9e12-88a91b2c3d4e',
+    letterNumber: 'AMLAK-2026-08912',
+    customerName: 'Alfiya Khan',
+    bankName: 'Amlak Finance PJSC',
+    accountNumber: 'ABCDEFGH123',
+    liabilityAmount: 150000.00,
+    issueDate: '2026-10-22',
+    expiryDate: '2026-10-23',
+    status: 'ACTIVE',
+    issuedBy: 'Alfiya',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-08912'
+  },
+  {
+    id: '7a0133c3-a8a6-4835-8f66-fa5421d971ae',
+    letterNumber: 'AMLAK-2026-04198',
+    customerName: 'Emirates Trade Corp',
+    bankName: 'Amlak Finance PJSC',
+    accountNumber: 'asdf123456789',
+    liabilityAmount: 420000.00,
+    issueDate: '2026-10-08',
+    expiryDate: '2026-10-10',
+    status: 'ACTIVE',
+    issuedBy: 'admin2',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-04198'
+  },
+  {
+    id: '8083b206-df90-41bf-ac54-ee6fb1049b8a',
+    letterNumber: 'AMLAK-2026-05510',
+    customerName: 'Dubai Horizon Ltd',
+    bankName: 'Emirates NBD',
+    accountNumber: 'ENBD99881122',
+    liabilityAmount: 275000.00,
+    issueDate: '2026-09-15',
+    expiryDate: '2026-09-29',
+    status: 'EXPIRED',
+    issuedBy: 'staff1',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-05510'
+  },
+  {
+    id: '9123c456-bf78-4901-a123-bcdef456789a',
+    letterNumber: 'AMLAK-2026-07734',
+    customerName: 'Sharjah Real Estate',
+    bankName: 'Dubai Islamic Bank',
+    accountNumber: 'DIB44556677',
+    liabilityAmount: 890000.00,
+    issueDate: '2026-10-01',
+    expiryDate: '2026-11-01',
+    status: 'ACTIVE',
+    issuedBy: 'Alfiya',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-07734'
+  },
+  {
+    id: 'b234d567-ca89-4012-b234-cdef567890ab',
+    letterNumber: 'AMLAK-2026-09912',
+    customerName: 'Abu Dhabi Investments',
+    bankName: 'First Abu Dhabi Bank',
+    accountNumber: 'FAB11223344',
+    liabilityAmount: 620000.00,
+    issueDate: '2026-10-03',
+    expiryDate: '2026-11-03',
+    status: 'ACTIVE',
+    issuedBy: 'admin2',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-09912'
+  },
+  {
+    id: 'c345e678-db90-4123-c345-defa678901bc',
+    letterNumber: 'AMLAK-2026-01145',
+    customerName: 'Al Maktoum Holdings',
+    bankName: 'Mashreq Bank',
+    accountNumber: 'MSHQ55667788',
+    liabilityAmount: 340000.00,
+    issueDate: '2026-09-01',
+    expiryDate: '2026-09-15',
+    status: 'EXPIRED',
+    issuedBy: 'staff1',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-01145'
+  },
+  {
+    id: 'd456f789-ec01-4234-d456-efab789012cd',
+    letterNumber: 'AMLAK-2026-02267',
+    customerName: 'Creek Logistics FZE',
+    bankName: 'Abu Dhabi Commercial Bank',
+    accountNumber: 'ADCB88990011',
+    liabilityAmount: 195000.00,
+    issueDate: '2026-10-04',
+    expiryDate: '2026-11-04',
+    status: 'ACTIVE',
+    issuedBy: 'Alfiya',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-02267'
+  },
+  {
+    id: 'e567a890-fd12-4345-e567-fabc890123de',
+    letterNumber: 'AMLAK-2026-03389',
+    customerName: 'RAK Global Ventures',
+    bankName: 'RAKBANK',
+    accountNumber: 'RAK33445566',
+    liabilityAmount: 510000.00,
+    issueDate: '2026-10-05',
+    expiryDate: '2026-11-05',
+    status: 'ACTIVE',
+    issuedBy: 'admin2',
+    qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-03389'
+  }
+];
+
 // Demo fallback mock interceptor for static Vercel hosting
 API.interceptors.response.use(
   (response) => response,
@@ -61,124 +169,62 @@ API.interceptors.response.use(
       });
     }
 
-    // 3. Letters Stats & Dashboard Data Fallback
+    // 3. Letter Upload / Generate Endpoint
+    if (url.includes('/letters/generate') || url.includes('/letters/upload')) {
+      const form = error.config?.data;
+      let accountNumber = 'AF' + Math.floor(1000000000 + Math.random() * 9000000000);
+      let bankName = 'Amlak Finance PJSC';
+      let issueDate = new Date().toISOString().split('T')[0];
+      let expiryDate = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+
+      if (form && typeof form.get === 'function') {
+        accountNumber = form.get('accountNumber') || accountNumber;
+        bankName = form.get('bankName') || bankName;
+        issueDate = form.get('issueDate') || issueDate;
+        expiryDate = form.get('expiryDate') || expiryDate;
+      }
+
+      const randomNum = Math.floor(10000 + Math.random() * 90000);
+      const newLetter = {
+        id: 'new-' + Date.now().toString(36),
+        letterNumber: `AMLAK-2026-${randomNum}`,
+        customerName: 'Verified Client ' + Math.floor(100 + Math.random() * 900),
+        bankName,
+        accountNumber,
+        liabilityAmount: 280000.00,
+        issueDate,
+        expiryDate,
+        status: 'ACTIVE',
+        issuedBy: 'Alfiya (Admin)',
+        qrCode: `https://amlak-finance.vercel.app/verify/AMLAK-2026-${randomNum}`
+      };
+
+      // Add newly uploaded letter to top of mock store
+      mockLettersStore.unshift(newLetter);
+
+      return Promise.resolve({
+        data: newLetter,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: error.config
+      });
+    }
+
+    // 4. Letters Stats & Dashboard Data Fallback
     if (url.includes('/letters/stats') || url.includes('/letters')) {
-      const mockLetters = [
-        {
-          id: 'dc14a8cf-c4a1-432b-9e12-88a91b2c3d4e',
-          letterNumber: 'AMLAK-2026-08912',
-          customerName: 'Alfiya Khan',
-          bankName: 'Amlak Finance PJSC',
-          accountNumber: 'ABCDEFGH123',
-          liabilityAmount: 150000.00,
-          issueDate: '2026-10-22',
-          expiryDate: '2026-10-23',
-          status: 'ACTIVE',
-          issuedBy: 'Alfiya',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-08912'
-        },
-        {
-          id: '7a0133c3-a8a6-4835-8f66-fa5421d971ae',
-          letterNumber: 'AMLAK-2026-04198',
-          customerName: 'Emirates Trade Corp',
-          bankName: 'Amlak Finance PJSC',
-          accountNumber: 'asdf123456789',
-          liabilityAmount: 420000.00,
-          issueDate: '2026-10-08',
-          expiryDate: '2026-10-10',
-          status: 'ACTIVE',
-          issuedBy: 'admin2',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-04198'
-        },
-        {
-          id: '8083b206-df90-41bf-ac54-ee6fb1049b8a',
-          letterNumber: 'AMLAK-2026-05510',
-          customerName: 'Dubai Horizon Ltd',
-          bankName: 'Emirates NBD',
-          accountNumber: 'ENBD99881122',
-          liabilityAmount: 275000.00,
-          issueDate: '2026-09-15',
-          expiryDate: '2026-09-29',
-          status: 'EXPIRED',
-          issuedBy: 'staff1',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-05510'
-        },
-        {
-          id: '9123c456-bf78-4901-a123-bcdef456789a',
-          letterNumber: 'AMLAK-2026-07734',
-          customerName: 'Sharjah Real Estate',
-          bankName: 'Dubai Islamic Bank',
-          accountNumber: 'DIB44556677',
-          liabilityAmount: 890000.00,
-          issueDate: '2026-10-01',
-          expiryDate: '2026-11-01',
-          status: 'ACTIVE',
-          issuedBy: 'Alfiya',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-07734'
-        },
-        {
-          id: 'b234d567-ca89-4012-b234-cdef567890ab',
-          letterNumber: 'AMLAK-2026-09912',
-          customerName: 'Abu Dhabi Investments',
-          bankName: 'First Abu Dhabi Bank',
-          accountNumber: 'FAB11223344',
-          liabilityAmount: 620000.00,
-          issueDate: '2026-10-03',
-          expiryDate: '2026-11-03',
-          status: 'ACTIVE',
-          issuedBy: 'admin2',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-09912'
-        },
-        {
-          id: 'c345e678-db90-4123-c345-defa678901bc',
-          letterNumber: 'AMLAK-2026-01145',
-          customerName: 'Al Maktoum Holdings',
-          bankName: 'Mashreq Bank',
-          accountNumber: 'MSHQ55667788',
-          liabilityAmount: 340000.00,
-          issueDate: '2026-09-01',
-          expiryDate: '2026-09-15',
-          status: 'EXPIRED',
-          issuedBy: 'staff1',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-01145'
-        },
-        {
-          id: 'd456f789-ec01-4234-d456-efab789012cd',
-          letterNumber: 'AMLAK-2026-02267',
-          customerName: 'Creek Logistics FZE',
-          bankName: 'Abu Dhabi Commercial Bank',
-          accountNumber: 'ADCB88990011',
-          liabilityAmount: 195000.00,
-          issueDate: '2026-10-04',
-          expiryDate: '2026-11-04',
-          status: 'ACTIVE',
-          issuedBy: 'Alfiya',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-02267'
-        },
-        {
-          id: 'e567a890-fd12-4345-e567-fabc890123de',
-          letterNumber: 'AMLAK-2026-03389',
-          customerName: 'RAK Global Ventures',
-          bankName: 'RAKBANK',
-          accountNumber: 'RAK33445566',
-          liabilityAmount: 510000.00,
-          issueDate: '2026-10-05',
-          expiryDate: '2026-11-05',
-          status: 'ACTIVE',
-          issuedBy: 'admin2',
-          qrCode: 'https://amlak-finance.vercel.app/verify/AMLAK-2026-03389'
-        }
-      ];
+      const activeCount = mockLettersStore.filter(l => l.status === 'ACTIVE').length;
+      const expiredCount = mockLettersStore.filter(l => l.status === 'EXPIRED').length;
 
       return Promise.resolve({
         data: {
           stats: {
-            totalLetters: 8,
-            activeLetters: 6,
-            expiredLetters: 2,
+            totalLetters: mockLettersStore.length,
+            activeLetters: activeCount,
+            expiredLetters: expiredCount,
             authorizedIssuers: 3
           },
-          letters: mockLetters,
+          letters: mockLettersStore,
           issuers: ['Alfiya', 'admin2', 'staff1']
         },
         status: 200,
@@ -188,7 +234,7 @@ API.interceptors.response.use(
       });
     }
 
-    // 4. Auth Me / Profile
+    // 5. Auth Me / Profile
     if (url.includes('/auth/me') || url.includes('/users')) {
       return Promise.resolve({
         data: {
@@ -204,7 +250,7 @@ API.interceptors.response.use(
       });
     }
 
-    // 5. Letter Verification Public Endpoint
+    // 6. Letter Verification Public Endpoint
     if (url.includes('/verify')) {
       return Promise.resolve({
         data: {
