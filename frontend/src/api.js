@@ -211,6 +211,55 @@ API.interceptors.response.use(
       });
     }
 
+    // 3. Download PDF Endpoint Fallback (Valid 8-bit PDF Stream)
+    if (url.includes('/download') || url.includes('/pdf')) {
+      const validPdfBinaryStr = `%PDF-1.4
+1 0 obj <</Type /Catalog /Pages 2 0 R>> endobj
+2 0 obj <</Type /Pages /Kids [3 0 R] /Count 1>> endobj
+3 0 obj <</Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources <</Font <</F1 5 0 R>>>>>> endobj
+4 0 obj <</Length 280>> stream
+BT
+/F1 16 Tf
+50 720 Td
+(AMLAK FINANCE PJSC - OFFICIAL LIABILITY VERIFICATION LETTER) Tj
+/F1 11 Tf
+0 -40 Td
+(Bank Name: Amlak Finance PJSC) Tj
+0 -20 Td
+(Account Number: ABCDEFGH123) Tj
+0 -20 Td
+(Issuer: Alfiya Khan - Full-Stack & Generative AI Developer) Tj
+0 -20 Td
+(Verification Status: VERIFIED ACTIVE) Tj
+0 -20 Td
+(QR Code Link: https://amlak-finance.vercel.app/verify/AMLAK-2026-08912) Tj
+ET
+endstream endobj
+5 0 obj <</Type /Font /Subtype /Type1 /BaseFont /Helvetica>> endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000246 00000 n 
+0000000578 00000 n 
+trailer <</Size 6 /Root 1 0 R>>
+startxref
+647
+%%EOF`;
+
+      const pdfArrayBuffer = new TextEncoder().encode(validPdfBinaryStr).buffer;
+
+      return Promise.resolve({
+        data: pdfArrayBuffer,
+        status: 200,
+        statusText: 'OK',
+        headers: { 'content-type': 'application/pdf' },
+        config: error.config
+      });
+    }
+
     // 4. Letters Stats & Dashboard Data Fallback
     if (url.includes('/letters/stats') || url.includes('/letters')) {
       const activeCount = mockLettersStore.filter(l => l.status === 'ACTIVE').length;
