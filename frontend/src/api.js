@@ -15,8 +15,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Global in-memory demo store for dynamic letter uploads
-let mockLettersStore = [
+const defaultLettersStore = [
   {
     id: 'dc14a8cf-c4a1-432b-9e12-88a91b2c3d4e',
     letterNumber: 'AMLAK-2026-08912',
@@ -123,6 +122,23 @@ let mockLettersStore = [
   }
 ];
 
+// Helper functions for persistent localStorage letters store
+const getStoredLetters = () => {
+  try {
+    const saved = localStorage.getItem('amlak_demo_letters_store');
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return [...defaultLettersStore];
+};
+
+const saveStoredLetters = (letters) => {
+  try {
+    localStorage.setItem('amlak_demo_letters_store', JSON.stringify(letters));
+  } catch (e) {}
+};
+
+let mockLettersStore = getStoredLetters();
+
 // Demo fallback mock interceptor for static Vercel hosting
 API.interceptors.response.use(
   (response) => response,
@@ -199,8 +215,9 @@ API.interceptors.response.use(
         qrCode: `https://amlak-finance.vercel.app/verify/AMLAK-2026-${randomNum}`
       };
 
-      // Add newly uploaded letter to top of mock store
+      // Add newly uploaded letter to top of mock store & save to localStorage
       mockLettersStore.unshift(newLetter);
+      saveStoredLetters(mockLettersStore);
 
       return Promise.resolve({
         data: newLetter,
@@ -211,7 +228,7 @@ API.interceptors.response.use(
       });
     }
 
-    // 3. Download PDF Endpoint Fallback (Valid 8-bit PDF Stream)
+    // 4. Download PDF Endpoint Fallback (Valid 8-bit PDF Stream)
     if (url.includes('/download') || url.includes('/pdf')) {
       const validPdfBinaryStr = `%PDF-1.4
 1 0 obj <</Type /Catalog /Pages 2 0 R>> endobj
@@ -260,7 +277,7 @@ startxref
       });
     }
 
-    // 4. Letters Stats & Dashboard Data Fallback
+    // 5. Letters Stats & Dashboard Data Fallback
     if (url.includes('/letters/stats') || url.includes('/letters')) {
       const activeCount = mockLettersStore.filter(l => l.status === 'ACTIVE').length;
       const expiredCount = mockLettersStore.filter(l => l.status === 'EXPIRED').length;
@@ -283,7 +300,7 @@ startxref
       });
     }
 
-    // 5. Auth Me / Profile
+    // 6. Auth Me / Profile
     if (url.includes('/auth/me') || url.includes('/users')) {
       return Promise.resolve({
         data: {
@@ -299,7 +316,7 @@ startxref
       });
     }
 
-    // 6. Letter Verification Public Endpoint
+    // 7. Letter Verification Public Endpoint
     if (url.includes('/verify')) {
       return Promise.resolve({
         data: {
