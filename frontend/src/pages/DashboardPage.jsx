@@ -553,11 +553,11 @@ export const DashboardPage = () => {
 
                       {/* Issued By */}
                       <td className="py-3 px-3">
-                        <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-900 rounded-lg font-black text-[10px] border border-amber-200">
-                          <div className="w-3.5 h-3.5 rounded-full bg-amber-200 text-amber-900 text-[8px] font-black flex items-center justify-center uppercase">
-                            {row.issuedBy?.username?.charAt(0)}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-950 rounded-lg font-extrabold text-[11px] border border-amber-200/90 shadow-2xs">
+                          <div className="w-4 h-4 rounded-full bg-amber-200 text-amber-900 text-[9px] font-black flex items-center justify-center uppercase shrink-0">
+                            {(row.issuedBy?.username || 'admin2').charAt(0)}
                           </div>
-                          <span>{row.issuedBy?.username}</span>
+                          <span>{row.issuedBy?.username || 'admin2'}</span>
                         </div>
                       </td>
 

@@ -63,7 +63,12 @@ export const UploadLetterPage = () => {
         navigate('/dashboard');
       }, 2200);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to generate verifiable letter.');
+      if (err.response?.status === 401) {
+        setError('Session expired or unauthorized. Redirecting to Login page...');
+        setTimeout(() => navigate('/login'), 1800);
+      } else {
+        setError(err.response?.data?.message || 'Failed to generate verifiable letter.');
+      }
     } finally {
       setLoading(false);
     }
@@ -187,7 +192,7 @@ export const UploadLetterPage = () => {
                   <div className="flex items-center gap-2 text-xs font-black text-emerald-900 bg-white px-3 py-1 rounded-lg border border-emerald-200 shadow-2xs">
                     <FileText className="w-3.5 h-3.5 text-emerald-600" />
                     <span>{file.name}</span>
-                    <span className="text-slate-400 font-medium">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                    <span className="text-slate-400 font-medium">({file.size < 1024 * 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${(file.size / (1024 * 1024)).toFixed(2)} MB`})</span>
                   </div>
                 ) : (
                   <div className="text-left">

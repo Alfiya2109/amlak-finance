@@ -49,6 +49,18 @@ const pdf_lib_1 = require("pdf-lib");
 const QRCode = __importStar(require("qrcode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const os = __importStar(require("os"));
+function getLocalIpAddress() {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const net of interfaces[name] || []) {
+            if (net.family === 'IPv4' && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+    return 'localhost';
+}
 let LettersService = class LettersService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -132,7 +144,8 @@ let LettersService = class LettersService {
             },
             include: { issuedBy: true },
         });
-        const baseUrl = process.env.VERIFY_BASE_URL || 'http://192.168.0.114:5173';
+        const localIp = getLocalIpAddress();
+        const baseUrl = process.env.VERIFY_BASE_URL || `http://${localIp}:5173`;
         const verifyUrl = `${baseUrl}/verify/${letter.id}`;
         const qrDataUrl = await QRCode.toDataURL(verifyUrl);
         const uploadsDir = path.join(process.cwd(), 'uploads');

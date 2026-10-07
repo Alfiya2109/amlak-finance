@@ -4,6 +4,19 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import * as QRCode from 'qrcode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
+
+function getLocalIpAddress(): string {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const net of interfaces[name] || []) {
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return 'localhost';
+}
 
 @Injectable()
 export class LettersService {
@@ -108,8 +121,9 @@ export class LettersService {
       include: { issuedBy: true },
     });
 
-    // 2. Generate Verification URL (Uses local Wi-Fi IP so mobile phone camera scanning works)
-    const baseUrl = process.env.VERIFY_BASE_URL || 'http://192.168.0.114:5173';
+    // 2. Generate Verification URL (Dynamic Wi-Fi IP so mobile camera scanning works)
+    const localIp = getLocalIpAddress();
+    const baseUrl = process.env.VERIFY_BASE_URL || `http://${localIp}:5173`;
     const verifyUrl = `${baseUrl}/verify/${letter.id}`;
     const qrDataUrl = await QRCode.toDataURL(verifyUrl);
 

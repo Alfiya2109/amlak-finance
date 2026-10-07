@@ -13,7 +13,7 @@ export const LoginPage = () => {
   const [username, setUsername] = useState('admin2');
   const [password, setPassword] = useState('Admin@123');
   const [totpCode, setTotpCode] = useState('');
-  const [showQr, setShowQr] = useState(true);
+  const [showQr, setShowQr] = useState(false);
 
   const [tempData, setTempData] = useState(null);
   const [error, setError] = useState('');
@@ -75,18 +75,18 @@ export const LoginPage = () => {
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden animate-in fade-in duration-300">
         
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 px-6 py-6 text-center text-white relative">
-          <div className="w-14 h-14 bg-white/10 rounded-2xl border border-white/20 flex items-center justify-center mx-auto mb-2 backdrop-blur-md shadow-inner">
-            <ShieldCheck className="w-8 h-8 text-amber-400" />
+        <div className="bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 px-5 py-5 text-center text-white relative">
+          <div className="w-12 h-12 bg-white/10 rounded-2xl border border-white/20 flex items-center justify-center mx-auto mb-2 backdrop-blur-md shadow-inner">
+            <ShieldCheck className="w-7 h-7 text-amber-400" />
           </div>
-          <h1 className="text-xl font-black tracking-tight">Amlak Finance PJSC</h1>
-          <p className="text-emerald-200/80 text-[11px] font-medium mt-0.5">VerifyLetter — Secure Liability Verification Portal</p>
+          <h1 className="text-lg sm:text-xl font-black tracking-tight">Amlak Finance PJSC</h1>
+          <p className="text-emerald-200/80 text-[10px] font-medium mt-0.5">VerifyLetter — Secure Liability Verification Portal</p>
         </div>
 
-        <div className="p-5 sm:p-6 space-y-4">
+        <div className="p-4 sm:p-5 space-y-3.5">
 
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold rounded-xl flex items-center gap-2">
+            <div className="p-2.5 bg-rose-50 border border-rose-200/80 text-rose-700 text-xs font-semibold rounded-xl flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-rose-500"></span>
               <span>{error}</span>
             </div>
@@ -94,7 +94,7 @@ export const LoginPage = () => {
 
           {step === 1 ? (
             /* STEP 1: LOGIN FORM */
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Username</label>
                 <div className="relative">
@@ -136,7 +136,7 @@ export const LoginPage = () => {
               </div>
 
               {/* Quick Credentials Card */}
-              <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-600 space-y-1">
+              <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-600 space-y-1">
                 <p className="font-extrabold text-slate-800 text-[11px]">Quick Test Credentials:</p>
                 <div className="flex justify-between items-center text-[11px] font-medium">
                   <span>Admin: <strong className="text-emerald-800 font-bold">admin2</strong> / Admin@123</span>
@@ -146,14 +146,14 @@ export const LoginPage = () => {
             </form>
           ) : (
             /* STEP 2: MICROSOFT AUTHENTICATOR 2FA SCREEN */
-            <form onSubmit={handleVerify2FA} className="space-y-4">
-              <div className="text-center bg-blue-50/80 border border-blue-200/80 p-3.5 rounded-2xl space-y-1.5">
-                <div className="flex items-center justify-center gap-2 text-blue-900 font-extrabold text-xs">
+            <form onSubmit={handleVerify2FA} className="space-y-3.5">
+              <div className="text-center bg-blue-50/70 border border-blue-200/70 p-3 rounded-2xl space-y-1.5">
+                <div className="flex items-center justify-center gap-1.5 text-blue-900 font-extrabold text-xs">
                   <Smartphone className="w-4 h-4 text-blue-600" />
-                  Microsoft Authenticator App
+                  Microsoft Authenticator 2FA
                 </div>
                 <p className="text-[11px] text-blue-800 font-medium">
-                  Enter 6-digit code for <strong>{username}</strong>.
+                  Enter 6-digit code for <strong className="font-extrabold">{username}</strong>
                 </p>
 
                 {/* QR Code Setup Toggle */}
@@ -162,35 +162,35 @@ export const LoginPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowQr(!showQr)}
-                      className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200 shadow-2xs cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200 shadow-2xs cursor-pointer"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       {showQr ? 'Hide Microsoft QR Code' : 'Scan Phone QR Code'}
                     </button>
 
                     {showQr && (
-                      <div className="mt-2 bg-white p-2.5 rounded-xl border border-blue-200 shadow-2xs space-y-1.5">
+                      <div className="mt-2 bg-white p-2 rounded-xl border border-blue-200 shadow-2xs space-y-1.5">
                         <p className="text-[10px] text-slate-600 font-medium">
                           Scan QR in <strong>Microsoft Authenticator</strong> app:
                         </p>
                         {tempData.twoFactorSecret ? (
-                          <div className="flex justify-center p-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs w-fit mx-auto">
+                          <div className="flex justify-center p-1 bg-white border border-slate-200 rounded-lg shadow-2xs w-fit mx-auto">
                             <QRCodeSVG 
                               value={`otpauth://totp/AmlakFinance:${username}?secret=${tempData.twoFactorSecret}&issuer=AmlakFinance`} 
-                              size={112}
+                              size={96}
                               level="M"
-                              includeMargin={true}
+                              includeMargin={false}
                             />
                           </div>
                         ) : (
                           <img
                             src={tempData.qrCodeImageDataUrl}
                             alt="Microsoft Authenticator QR"
-                            className="w-28 h-28 mx-auto border-2 border-slate-200 rounded-lg shadow-2xs"
+                            className="w-24 h-24 mx-auto border border-slate-200 rounded-lg shadow-2xs"
                           />
                         )}
                         {tempData.twoFactorSecret && (
-                          <p className="text-[10px] font-mono text-slate-500 bg-slate-50 p-1 rounded-md border border-slate-200 truncate">
+                          <p className="text-[10px] font-mono text-slate-600 bg-slate-50 p-1 rounded border border-slate-200 truncate">
                             Key: {tempData.twoFactorSecret}
                           </p>
                         )}
@@ -203,9 +203,9 @@ export const LoginPage = () => {
               {/* 6-Digit Code Input */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 text-center">
-                  6-Digit Security Verification Code
+                  6-Digit Security Code
                 </label>
-                <div className="relative max-w-[200px] mx-auto">
+                <div className="relative max-w-[180px] mx-auto">
                   <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
@@ -214,23 +214,9 @@ export const LoginPage = () => {
                     value={totpCode}
                     onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="406017"
-                    className="w-full pl-9 pr-3 py-2 text-center tracking-widest font-mono text-base font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:bg-white focus:outline-none"
+                    className="w-full pl-9 pr-3 py-2 text-center tracking-widest font-mono text-sm font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:bg-white focus:outline-none"
                   />
                 </div>
-
-                {/* Quick Auto-Fill Test Code Button */}
-                {tempData?.currentTotpCode && (
-                  <div className="mt-2 text-center">
-                    <button
-                      type="button"
-                      onClick={handleFillLiveCode}
-                      className="inline-flex items-center gap-1.5 text-[11px] text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-3 py-1 rounded-full font-bold transition-colors cursor-pointer shadow-2xs"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                      Auto-fill Live Code ({tempData.currentTotpCode})
-                    </button>
-                  </div>
-                )}
               </div>
 
               <div className="space-y-1.5 pt-1">
