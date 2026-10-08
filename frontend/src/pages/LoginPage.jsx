@@ -30,6 +30,7 @@ export const LoginPage = () => {
       
       if (res.data.require2FA) {
         setTempData(res.data);
+        setShowQr(false); // Ensure QR Scanner is hidden by default during login
         setStep(2); // Move to 2FA verification step
       } else {
         loginSuccess(res.data.accessToken, res.data.user);
@@ -61,12 +62,6 @@ export const LoginPage = () => {
       setError(err.response?.data?.message || 'Invalid 6-digit code. Please check Microsoft Authenticator.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFillLiveCode = () => {
-    if (tempData?.currentTotpCode) {
-      setTotpCode(tempData.currentTotpCode);
     }
   };
 
@@ -145,87 +140,46 @@ export const LoginPage = () => {
               </div>
             </form>
           ) : (
-            /* STEP 2: MICROSOFT AUTHENTICATOR 2FA SCREEN */
-            <form onSubmit={handleVerify2FA} className="space-y-3.5">
-              <div className="text-center bg-blue-50/70 border border-blue-200/70 p-3 rounded-2xl space-y-1.5">
-                <div className="flex items-center justify-center gap-1.5 text-blue-900 font-extrabold text-xs">
-                  <Smartphone className="w-4 h-4 text-blue-600" />
-                  Microsoft Authenticator 2FA
+            /* STEP 2: MICROSOFT AUTHENTICATOR 2FA CODE SCREEN (CLEAN, NO DEFAULT SCANNER) */
+            <form onSubmit={handleVerify2FA} className="space-y-4">
+              <div className="text-center bg-emerald-50/70 border border-emerald-200/70 p-3.5 rounded-2xl space-y-1">
+                <div className="flex items-center justify-center gap-1.5 text-emerald-950 font-extrabold text-xs">
+                  <Smartphone className="w-4 h-4 text-emerald-700" />
+                  2-Step Verification
                 </div>
-                <p className="text-[11px] text-blue-800 font-medium">
-                  Enter 6-digit code for <strong className="font-extrabold">{username}</strong>
+                <p className="text-[11px] text-emerald-800 font-medium">
+                  Enter 6-digit code from Microsoft Authenticator for <strong className="font-extrabold">{username}</strong>
                 </p>
-
-                {/* QR Code Setup Toggle */}
-                {tempData?.qrCodeImageDataUrl && (
-                  <div className="pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowQr(!showQr)}
-                      className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 hover:text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200 shadow-2xs cursor-pointer"
-                    >
-                      <QrCode className="w-3.5 h-3.5" />
-                      {showQr ? 'Hide Microsoft QR Code' : 'Scan Phone QR Code'}
-                    </button>
-
-                    {showQr && (
-                      <div className="mt-2 bg-white p-2 rounded-xl border border-blue-200 shadow-2xs space-y-1.5">
-                        <p className="text-[10px] text-slate-600 font-medium">
-                          Scan QR in <strong>Microsoft Authenticator</strong> app:
-                        </p>
-                        {tempData.twoFactorSecret ? (
-                          <div className="flex justify-center p-1 bg-white border border-slate-200 rounded-lg shadow-2xs w-fit mx-auto">
-                            <QRCodeSVG 
-                              value={`otpauth://totp/AmlakFinance:${username}?secret=${tempData.twoFactorSecret}&issuer=AmlakFinance`} 
-                              size={96}
-                              level="M"
-                              includeMargin={false}
-                            />
-                          </div>
-                        ) : (
-                          <img
-                            src={tempData.qrCodeImageDataUrl}
-                            alt="Microsoft Authenticator QR"
-                            className="w-24 h-24 mx-auto border border-slate-200 rounded-lg shadow-2xs"
-                          />
-                        )}
-                        {tempData.twoFactorSecret && (
-                          <p className="text-[10px] font-mono text-slate-600 bg-slate-50 p-1 rounded border border-slate-200 truncate">
-                            Key: {tempData.twoFactorSecret}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
 
               {/* 6-Digit Code Input */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1 text-center">
-                  6-Digit Security Code
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-700 text-center">
+                  Enter 6-Digit Code
                 </label>
-                <div className="relative max-w-[180px] mx-auto">
-                  <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <div className="relative max-w-[200px] mx-auto">
+                  <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                   <input
                     type="text"
                     maxLength={6}
                     required
+                    autoFocus
                     value={totpCode}
                     onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="406017"
-                    className="w-full pl-9 pr-3 py-2 text-center tracking-widest font-mono text-sm font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:bg-white focus:outline-none"
+                    placeholder="••••••"
+                    className="w-full pl-9 pr-3 py-2.5 text-center tracking-widest font-mono text-base font-extrabold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:bg-white focus:outline-none shadow-xs"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-1">
+              {/* Verify Button */}
+              <div className="space-y-2 pt-1">
                 <button
                   type="submit"
                   disabled={loading || totpCode.length < 6}
                   className="w-full bg-gradient-to-r from-emerald-800 to-teal-900 hover:from-emerald-900 hover:to-teal-950 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  {loading ? 'Verifying Code...' : 'Verify & Continue'}
+                  {loading ? 'Verifying Code...' : 'Verify Code & Sign In'}
                 </button>
 
                 <button
@@ -233,9 +187,52 @@ export const LoginPage = () => {
                   onClick={() => setStep(1)}
                   className="w-full text-xs font-semibold text-slate-500 hover:text-slate-800 py-1 flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Login
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Username & Password
                 </button>
               </div>
+
+              {/* Optional QR Code Toggle Link (Hidden by default) */}
+              {tempData?.qrCodeImageDataUrl && (
+                <div className="text-center pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowQr(!showQr)}
+                    className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-emerald-800 transition-colors cursor-pointer"
+                  >
+                    <QrCode className="w-3.5 h-3.5" />
+                    {showQr ? 'Hide Setup QR Code' : 'First-time phone setup? Show QR Code'}
+                  </button>
+
+                  {showQr && (
+                    <div className="mt-2.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-2xs space-y-2 max-w-[240px] mx-auto animate-in fade-in duration-200">
+                      <p className="text-[10px] text-slate-600 font-semibold">
+                        Scan QR in <strong>Microsoft Authenticator</strong> app:
+                      </p>
+                      {tempData.twoFactorSecret ? (
+                        <div className="flex justify-center p-1.5 bg-white border border-slate-200 rounded-xl shadow-2xs w-fit mx-auto">
+                          <QRCodeSVG 
+                            value={`otpauth://totp/AmlakFinance:${username}?secret=${tempData.twoFactorSecret}&issuer=AmlakFinance`} 
+                            size={100}
+                            level="M"
+                            includeMargin={false}
+                          />
+                        </div>
+                      ) : (
+                        <img
+                          src={tempData.qrCodeImageDataUrl}
+                          alt="Microsoft Authenticator QR"
+                          className="w-24 h-24 mx-auto border border-slate-200 rounded-xl shadow-2xs"
+                        />
+                      )}
+                      {tempData.twoFactorSecret && (
+                        <p className="text-[9px] font-mono text-slate-600 bg-white p-1 rounded border border-slate-200 truncate">
+                          Key: {tempData.twoFactorSecret}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
             </form>
           )}
