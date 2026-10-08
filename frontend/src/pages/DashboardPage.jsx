@@ -21,10 +21,10 @@ import {
 
 export const DashboardPage = () => {
   const [stats, setStats] = useState({
-    totalLetters: 112,
-    activeLetters: 5,
-    expiredLetters: 107,
-    authorizedIssuers: 10,
+    totalLetters: 0,
+    activeLetters: 0,
+    expiredLetters: 0,
+    authorizedIssuers: 0,
   });
   const [rawLetters, setRawLetters] = useState([]);
   const [issuers, setIssuers] = useState([]);
@@ -48,10 +48,15 @@ export const DashboardPage = () => {
     try {
       const res = await API.get('/letters/stats');
       setStats(res.data.stats);
-      setRawLetters(res.data.letters);
+      setRawLetters(res.data.letters || []);
       setIssuers(res.data.issuers || []);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     } finally {
       setLoading(false);
     }
