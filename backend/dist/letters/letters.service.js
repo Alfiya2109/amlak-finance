@@ -159,12 +159,14 @@ let LettersService = class LettersService {
             const pages = pdfDoc.getPages();
             const firstPage = pages[0];
             const qrImagePng = await pdfDoc.embedPng(qrDataUrl);
-            const { width, height } = firstPage.getSize();
+            const { width } = firstPage.getSize();
+            const qrSize = 65;
+            const margin = 25;
             firstPage.drawImage(qrImagePng, {
-                x: width - 110,
-                y: height - 110,
-                width: 90,
-                height: 90,
+                x: width - margin - qrSize,
+                y: margin,
+                width: qrSize,
+                height: qrSize,
             });
             const pdfBytes = await pdfDoc.save();
             fs.writeFileSync(targetFilePath, pdfBytes);
@@ -172,12 +174,14 @@ let LettersService = class LettersService {
         else {
             const pdfDoc = await pdf_lib_1.PDFDocument.create();
             const page = pdfDoc.addPage([600, 800]);
+            const qrSize = 65;
+            const margin = 25;
             const qrImagePng = await pdfDoc.embedPng(qrDataUrl);
             page.drawImage(qrImagePng, {
-                x: 480,
-                y: 680,
-                width: 90,
-                height: 90,
+                x: 600 - margin - qrSize,
+                y: margin,
+                width: qrSize,
+                height: qrSize,
             });
             page.drawText('AMLAK FINANCE PJSC', { x: 50, y: 730, size: 22, color: (0, pdf_lib_1.rgb)(0.1, 0.4, 0.3) });
             page.drawText('LIABILITY LETTER VERIFICATION', { x: 50, y: 700, size: 14, color: (0, pdf_lib_1.rgb)(0.3, 0.3, 0.3) });

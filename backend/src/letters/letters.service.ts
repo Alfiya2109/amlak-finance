@@ -143,14 +143,15 @@ export class LettersService {
       const firstPage = pages[0];
 
       const qrImagePng = await pdfDoc.embedPng(qrDataUrl);
-      const { width, height } = firstPage.getSize();
-
-      // Draw QR Image in top right header box
+      const { width } = firstPage.getSize();
+      // Draw QR Image in bottom right corner with compact 65x65 size
+      const qrSize = 65;
+      const margin = 25;
       firstPage.drawImage(qrImagePng, {
-        x: width - 110,
-        y: height - 110,
-        width: 90,
-        height: 90,
+        x: width - margin - qrSize,
+        y: margin,
+        width: qrSize,
+        height: qrSize,
       });
 
       const pdfBytes = await pdfDoc.save();
@@ -160,12 +161,14 @@ export class LettersService {
       const pdfDoc = await PDFDocument.create();
       const page = pdfDoc.addPage([600, 800]);
       
+      const qrSize = 65;
+      const margin = 25;
       const qrImagePng = await pdfDoc.embedPng(qrDataUrl);
       page.drawImage(qrImagePng, {
-        x: 480,
-        y: 680,
-        width: 90,
-        height: 90,
+        x: 600 - margin - qrSize,
+        y: margin,
+        width: qrSize,
+        height: qrSize,
       });
 
       page.drawText('AMLAK FINANCE PJSC', { x: 50, y: 730, size: 22, color: rgb(0.1, 0.4, 0.3) });
