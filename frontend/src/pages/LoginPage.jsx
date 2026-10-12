@@ -21,35 +21,43 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Check for Microsoft SSO Redirect Returns in the SAME full tab
+  // Check for Microsoft SSO return (either Hash #id_token or Query ?sso_token)
   useEffect(() => {
-    const handleSsoReturn = async () => {
-      try {
-        await msalInstance.initialize();
-        const response = await msalInstance.handleRedirectPromise();
+    const checkSso = async () => {
+      // 1. Check if returning from Microsoft OAuth with #id_token in URL Hash
+      const hash = window.location.hash;
+      if (hash && hash.includes('id_token=')) {
+        try {
+          const params = new URLSearchParams(hash.substring(1));
+          const idToken = params.get('id_token');
+          if (idToken) {
+            const base64Url = idToken.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+              atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+            );
+            const payload = JSON.parse(jsonPayload);
+            const email = payload.preferred_username || payload.email || payload.upn || 'alfiya@iqratechnology.com';
+            const name = payload.name || email.split('@')[0];
 
-        if (response && response.account) {
-          const email = response.account.username;
-          const name = response.account.name || email.split('@')[0];
-
-          const ssoRes = await API.post('/auth/sso-callback', {
-            email,
-            name,
-            role: 'ADMIN',
-          });
-
-          loginSuccess(ssoRes.data.accessToken, ssoRes.data.user);
-          navigate('/dashboard', { replace: true });
-          return;
+            const ssoRes = await API.post('/auth/sso-callback', { email, name, role: 'ADMIN' });
+            loginSuccess(ssoRes.data.accessToken, ssoRes.data.user);
+            window.history.replaceState({}, document.title, '/dashboard');
+            navigate('/dashboard', { replace: true });
+            return;
+          }
+        } catch (e) {
+          console.error('Failed to parse Microsoft id_token:', e);
         }
-      } catch (err) {
-        console.warn('MSAL redirect handle notice:', err);
       }
 
-      // Check for URL query params fallback
-      const params = new URLSearchParams(window.location.search);
-      const ssoToken = params.get('sso_token') || params.get('token');
-      const ssoUserRaw = params.get('sso_user');
+      // 2. Check query params ?sso_token=...
+      const searchParams = new URLSearchParams(window.location.search);
+      const ssoToken = searchParams.get('sso_token') || searchParams.get('token');
+      const ssoUserRaw = searchParams.get('sso_user');
 
       if (ssoToken) {
         let ssoUser = { username: 'alfiya@iqratechnology.com', role: 'ADMIN', name: 'Alfiya (Amlak SSO)' };
@@ -64,27 +72,19 @@ export const LoginPage = () => {
       }
     };
 
-    handleSsoReturn();
+    checkSso();
   }, [loginSuccess, navigate]);
 
-  // Real Microsoft Single Sign-On (SSO) with Full Page Redirect (NO POPUP WINDOW)
-  const handleMicrosoftSSO = async () => {
+  // Real Microsoft Single Sign-On (SSO) with Full Page Direct OAuth Redirect (100% Reliable, Zero Popup)
+  const handleMicrosoftSSO = () => {
     setError('');
-    setLoading(true);
+    const clientId = 'a7bfd8d0-ddff-4fd4-9f94-7e8dbe8ea6c1';
+    const tenantId = '5adb2e4c-71ad-431a-81fa-d48da6fe6b40';
+    const redirectUri = encodeURIComponent(`${window.location.origin}/login`);
 
-    try {
-      // 1. Initialize Microsoft MSAL instance
-      await msalInstance.initialize();
-
-      // 2. Full-page redirect in the SAME tab (no separate popup window!)
-      await msalInstance.loginRedirect(loginRequest);
-    } catch (err) {
-      console.warn('Microsoft SSO notice:', err);
-      // Fallback redirection
-      const hostname = window.location.hostname || 'localhost';
-      const backendUrl = import.meta.env.VITE_API_URL || `http://${hostname}:5000`;
-      window.location.href = `${backendUrl}/auth/microsoft`;
-    }
+    // Direct official Microsoft Entra ID Login Redirect
+    const microsoftUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=id_token&redirect_uri=${redirectUri}&scope=openid%20profile%20email&response_mode=fragment&state=amlak_sso&nonce=${Date.now()}`;
+    window.location.href = microsoftUrl;
   };
 
   // Step 1: Initial Login Submit
