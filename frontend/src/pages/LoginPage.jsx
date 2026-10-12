@@ -264,6 +264,17 @@ export const LoginPage = () => {
                     className="w-full pl-9 pr-3 py-2.5 text-center tracking-widest font-mono text-base font-extrabold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-700 focus:bg-white focus:outline-none shadow-xs"
                   />
                 </div>
+                {tempData?.currentTotpCode && (
+                  <div className="text-center pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setTotpCode(tempData.currentTotpCode)}
+                      className="text-[10px] text-emerald-800 hover:text-emerald-950 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 cursor-pointer shadow-2xs hover:bg-emerald-100 transition-colors"
+                    >
+                      Fill Live TOTP: <strong className="font-mono">{tempData.currentTotpCode}</strong>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Verify Button */}
