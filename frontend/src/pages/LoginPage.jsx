@@ -99,7 +99,8 @@ export const LoginPage = () => {
     setError('');
     const clientId = 'a7bfd8d0-ddff-4fd4-9f94-7e8dbe8ea6c1';
     const tenantId = 'common';
-    const redirectUri = encodeURIComponent(`${window.location.origin}/login`);
+    // Use window.location.origin (e.g. http://localhost:5173) exactly as registered in Azure Portal
+    const redirectUri = encodeURIComponent(window.location.origin);
 
     // Standard Authorization Code Flow (Works by default in all Azure App Registrations)
     const microsoftUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=openid%20profile%20email&response_mode=query&state=amlak_sso`;

@@ -30,7 +30,8 @@ export default function App() {
           {/* Public Verification Route */}
           <Route path="/verify/:id" element={<VerifyPublicPage />} />
 
-          {/* Login Route */}
+          {/* Root & Login Route */}
+          <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
 
           {/* Protected Routes */}
