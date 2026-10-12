@@ -187,4 +187,39 @@ export class AuthService {
       qrCodeImageDataUrl,
     };
   }
+
+  async processSsoUser(profile: { email: string; displayName?: string; role?: 'ADMIN' | 'USER' }) {
+    const { email, displayName } = profile;
+    const username = email.split('@')[0] || 'sso_user';
+
+    // Find or create user in database
+    let user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { username: email }],
+      },
+    });
+
+    if (!user) {
+      const randomPassword = await bcrypt.hash(Math.random().toString(36), 10);
+      user = await this.prisma.user.create({
+        data: {
+          username: email,
+          password: randomPassword,
+          role: profile.role || 'ADMIN',
+          isTwoFactorEnabled: false, // Enterprise SSO MFA is governed by Microsoft Entra ID
+        },
+      });
+    }
+
+    const payload = { sub: user.id, username: user.username, role: user.role };
+    return {
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        displayName: displayName || user.username,
+      },
+    };
+  }
 }

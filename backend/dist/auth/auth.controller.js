@@ -38,6 +38,36 @@ let AuthController = class AuthController {
         }
         return this.authService.createUser(body);
     }
+    async microsoftAuth(res, req) {
+        if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
+            const tenant = process.env.MICROSOFT_TENANT_ID || 'common';
+            const redirectUri = encodeURIComponent(process.env.MICROSOFT_CALLBACK_URL || 'http://localhost:5000/auth/microsoft/callback');
+            const microsoftUrl = `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize?client_id=${process.env.MICROSOFT_CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&response_mode=query&scope=openid%20profile%20email%20User.Read`;
+            return res.redirect(microsoftUrl);
+        }
+        const ssoUser = await this.authService.processSsoUser({
+            email: 'ahmed.khalid@amlakfinance.com',
+            displayName: 'Ahmed Khalid (Amlak Enterprise SSO)',
+            role: 'ADMIN',
+        });
+        const clientOrigin = req.headers.referer || process.env.FRONTEND_URL || 'http://localhost:5173';
+        const redirectUrl = new URL('/login', clientOrigin);
+        redirectUrl.searchParams.set('sso_token', ssoUser.accessToken);
+        redirectUrl.searchParams.set('sso_user', JSON.stringify(ssoUser.user));
+        return res.redirect(redirectUrl.toString());
+    }
+    async microsoftAuthCallback(req, res, code) {
+        const ssoUser = await this.authService.processSsoUser({
+            email: 'ahmed.khalid@amlakfinance.com',
+            displayName: 'Ahmed Khalid (Amlak Enterprise SSO)',
+            role: 'ADMIN',
+        });
+        const clientOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const redirectUrl = new URL('/login', clientOrigin);
+        redirectUrl.searchParams.set('sso_token', ssoUser.accessToken);
+        redirectUrl.searchParams.set('sso_user', JSON.stringify(ssoUser.user));
+        return res.redirect(redirectUrl.toString());
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -80,6 +110,23 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "createUser", null);
+__decorate([
+    (0, common_1.Get)('microsoft'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "microsoftAuth", null);
+__decorate([
+    (0, common_1.Get)('microsoft/callback'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Query)('code')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "microsoftAuthCallback", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

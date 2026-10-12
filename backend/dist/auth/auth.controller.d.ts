@@ -1,4 +1,5 @@
 import { AuthService } from './auth.service';
+import { Response, Request as ExpressRequest } from 'express';
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
@@ -69,4 +70,6 @@ export declare class AuthController {
         twoFactorSecret: string;
         qrCodeImageDataUrl: any;
     }>;
+    microsoftAuth(res: Response, req: ExpressRequest): Promise<void>;
+    microsoftAuthCallback(req: ExpressRequest, res: Response, code?: string): Promise<void>;
 }

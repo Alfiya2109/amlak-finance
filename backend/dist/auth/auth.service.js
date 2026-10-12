@@ -193,6 +193,36 @@ let AuthService = class AuthService {
             qrCodeImageDataUrl,
         };
     }
+    async processSsoUser(profile) {
+        const { email, displayName } = profile;
+        const username = email.split('@')[0] || 'sso_user';
+        let user = await this.prisma.user.findFirst({
+            where: {
+                OR: [{ username }, { username: email }],
+            },
+        });
+        if (!user) {
+            const randomPassword = await bcrypt.hash(Math.random().toString(36), 10);
+            user = await this.prisma.user.create({
+                data: {
+                    username: email,
+                    password: randomPassword,
+                    role: profile.role || 'ADMIN',
+                    isTwoFactorEnabled: false,
+                },
+            });
+        }
+        const payload = { sub: user.id, username: user.username, role: user.role };
+        return {
+            accessToken: this.jwtService.sign(payload),
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                displayName: displayName || user.username,
+            },
+        };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

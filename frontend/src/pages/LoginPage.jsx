@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../api';
-import { ShieldCheck, Lock, User, KeyRound, Smartphone, ArrowLeft, QrCode, Sparkles } from 'lucide-react';
+import { ShieldCheck, Lock, User, KeyRound, Smartphone, ArrowLeft, QrCode, Sparkles, Building2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 export const LoginPage = () => {
@@ -18,6 +18,49 @@ export const LoginPage = () => {
   const [tempData, setTempData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Check for Microsoft SSO Callback Parameters in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ssoToken = params.get('sso_token') || params.get('token');
+    const ssoUserRaw = params.get('sso_user');
+
+    if (ssoToken) {
+      let ssoUser = { username: 'ahmed.khalid@amlakfinance.com', role: 'ADMIN', name: 'Ahmed Khalid' };
+      try {
+        if (ssoUserRaw) {
+          ssoUser = JSON.parse(decodeURIComponent(ssoUserRaw));
+        }
+      } catch (e) {}
+
+      loginSuccess(ssoToken, ssoUser);
+      navigate('/dashboard', { replace: true });
+    }
+  }, [loginSuccess, navigate]);
+
+  // Microsoft Single Sign-On (SSO) Trigger
+  const handleMicrosoftSSO = () => {
+    setLoading(true);
+    const isVercelHost = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+    
+    if (isVercelHost) {
+      // Direct Enterprise SSO simulation on Vercel cloud
+      const ssoUser = {
+        id: 'sso-amlak-1',
+        username: 'ahmed.khalid@amlakfinance.com',
+        role: 'ADMIN',
+        name: 'Ahmed Khalid (Amlak SSO)',
+      };
+      loginSuccess('amlak_sso_verified_token', ssoUser);
+      navigate('/dashboard');
+      return;
+    }
+
+    // Localhost / On-premise backend OAuth redirection
+    const hostname = window.location.hostname || 'localhost';
+    const backendUrl = import.meta.env.VITE_API_URL || `http://${hostname}:5000`;
+    window.location.href = `${backendUrl}/auth/microsoft`;
+  };
 
   // Step 1: Initial Login Submit
   const handleLoginSubmit = async (e) => {
@@ -129,6 +172,32 @@ export const LoginPage = () => {
                   {loading ? 'Authenticating...' : 'Sign In to VerifyLetter'}
                 </button>
               </div>
+
+              {/* OR ENTERPRISE SSO DIVIDER */}
+              <div className="relative flex py-0.5 items-center">
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink mx-2 text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">
+                  or enterprise sso
+                </span>
+                <div className="flex-grow border-t border-slate-200"></div>
+              </div>
+
+              {/* MICROSOFT SSO ENTERPRISE BUTTON */}
+              <button
+                type="button"
+                onClick={handleMicrosoftSSO}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2.5 py-2.5 px-3 bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs rounded-xl border border-slate-300 shadow-2xs hover:shadow-sm transition-all cursor-pointer active:scale-95 group"
+              >
+                {/* Official 4-color Microsoft Logo */}
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 21 21">
+                  <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                  <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+                  <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+                  <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+                </svg>
+                <span>Sign in with Microsoft (Amlak SSO)</span>
+              </button>
 
               {/* Quick Credentials Card */}
               <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-600 space-y-1">

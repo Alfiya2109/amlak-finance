@@ -78,4 +78,17 @@ export declare class AuthService {
         twoFactorSecret: string;
         qrCodeImageDataUrl: any;
     }>;
+    processSsoUser(profile: {
+        email: string;
+        displayName?: string;
+        role?: 'ADMIN' | 'USER';
+    }): Promise<{
+        accessToken: string;
+        user: {
+            id: string;
+            username: string;
+            role: string;
+            displayName: string;
+        };
+    }>;
 }
