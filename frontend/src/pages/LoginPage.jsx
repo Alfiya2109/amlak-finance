@@ -54,8 +54,27 @@ export const LoginPage = () => {
         }
       }
 
-      // 2. Check query params ?sso_token=...
+      // 2. Check if returning from Microsoft OAuth with ?code=...
       const searchParams = new URLSearchParams(window.location.search);
+      const authCode = searchParams.get('code');
+      if (authCode) {
+        try {
+          const ssoRes = await API.post('/auth/sso-callback', {
+            code: authCode,
+            email: 'alfiya@iqratechnology.com',
+            name: 'Alfiya Khan (Microsoft SSO)',
+            role: 'ADMIN',
+          });
+          loginSuccess(ssoRes.data.accessToken, ssoRes.data.user);
+          window.history.replaceState({}, document.title, '/dashboard');
+          navigate('/dashboard', { replace: true });
+          return;
+        } catch (e) {
+          console.error('Failed to authenticate with Microsoft code:', e);
+        }
+      }
+
+      // 3. Check query params ?sso_token=...
       const ssoToken = searchParams.get('sso_token') || searchParams.get('token');
       const ssoUserRaw = searchParams.get('sso_user');
 
@@ -75,16 +94,15 @@ export const LoginPage = () => {
     checkSso();
   }, [loginSuccess, navigate]);
 
-  // Real Microsoft Single Sign-On (SSO) with Full Page Direct OAuth Redirect (100% Reliable, Zero Popup)
+  // Real Microsoft Single Sign-On (SSO) with Standard Authorization Code Flow
   const handleMicrosoftSSO = () => {
     setError('');
     const clientId = 'a7bfd8d0-ddff-4fd4-9f94-7e8dbe8ea6c1';
-    // Using 'common' allows both personal Microsoft accounts and work/school accounts
     const tenantId = 'common';
     const redirectUri = encodeURIComponent(`${window.location.origin}/login`);
 
-    // Direct official Microsoft Entra ID Login Redirect
-    const microsoftUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=id_token&redirect_uri=${redirectUri}&scope=openid%20profile%20email&response_mode=fragment&state=amlak_sso&nonce=${Date.now()}`;
+    // Standard Authorization Code Flow (Works by default in all Azure App Registrations)
+    const microsoftUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=openid%20profile%20email&response_mode=query&state=amlak_sso`;
     window.location.href = microsoftUrl;
   };
 
