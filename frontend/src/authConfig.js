@@ -17,6 +17,7 @@ export const msalConfig = {
 // Scopes required for Microsoft SSO login
 export const loginRequest = {
   scopes: ['User.Read', 'openid', 'profile', 'email'],
+  prompt: 'select_account',
 };
 
 // Singleton MSAL instance
