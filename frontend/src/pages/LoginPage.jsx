@@ -21,26 +21,53 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Check for Microsoft SSO Callback Parameters in URL
+  // Check for Microsoft SSO Redirect Returns in the SAME full tab
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ssoToken = params.get('sso_token') || params.get('token');
-    const ssoUserRaw = params.get('sso_user');
-
-    if (ssoToken) {
-      let ssoUser = { username: 'alfiya@iqratechnology.com', role: 'ADMIN', name: 'Alfiya (Amlak SSO)' };
+    const handleSsoReturn = async () => {
       try {
-        if (ssoUserRaw) {
-          ssoUser = JSON.parse(decodeURIComponent(ssoUserRaw));
-        }
-      } catch (e) {}
+        await msalInstance.initialize();
+        const response = await msalInstance.handleRedirectPromise();
 
-      loginSuccess(ssoToken, ssoUser);
-      navigate('/dashboard', { replace: true });
-    }
+        if (response && response.account) {
+          const email = response.account.username;
+          const name = response.account.name || email.split('@')[0];
+
+          const ssoRes = await API.post('/auth/sso-callback', {
+            email,
+            name,
+            role: 'ADMIN',
+          });
+
+          loginSuccess(ssoRes.data.accessToken, ssoRes.data.user);
+          navigate('/dashboard', { replace: true });
+          return;
+        }
+      } catch (err) {
+        console.warn('MSAL redirect handle notice:', err);
+      }
+
+      // Check for URL query params fallback
+      const params = new URLSearchParams(window.location.search);
+      const ssoToken = params.get('sso_token') || params.get('token');
+      const ssoUserRaw = params.get('sso_user');
+
+      if (ssoToken) {
+        let ssoUser = { username: 'alfiya@iqratechnology.com', role: 'ADMIN', name: 'Alfiya (Amlak SSO)' };
+        try {
+          if (ssoUserRaw) {
+            ssoUser = JSON.parse(decodeURIComponent(ssoUserRaw));
+          }
+        } catch (e) {}
+
+        loginSuccess(ssoToken, ssoUser);
+        navigate('/dashboard', { replace: true });
+      }
+    };
+
+    handleSsoReturn();
   }, [loginSuccess, navigate]);
 
-  // Real Microsoft Single Sign-On (SSO) with Azure Entra ID Popup
+  // Real Microsoft Single Sign-On (SSO) with Full Page Redirect (NO POPUP WINDOW)
   const handleMicrosoftSSO = async () => {
     setError('');
     setLoading(true);
@@ -49,35 +76,14 @@ export const LoginPage = () => {
       // 1. Initialize Microsoft MSAL instance
       await msalInstance.initialize();
 
-      // 2. Open Official Microsoft Entra ID Login Popup
-      const response = await msalInstance.loginPopup(loginRequest);
-
-      if (response && response.account) {
-        const email = response.account.username;
-        const name = response.account.name || email.split('@')[0];
-
-        // 3. Complete authentication with backend
-        const ssoRes = await API.post('/auth/sso-callback', {
-          email,
-          name,
-          role: 'ADMIN',
-        });
-
-        loginSuccess(ssoRes.data.accessToken, ssoRes.data.user);
-        navigate('/dashboard');
-      }
+      // 2. Full-page redirect in the SAME tab (no separate popup window!)
+      await msalInstance.loginRedirect(loginRequest);
     } catch (err) {
       console.warn('Microsoft SSO notice:', err);
-      if (err.errorCode === 'user_cancelled') {
-        setError('Microsoft sign-in was cancelled by user.');
-      } else {
-        // Smooth backend fallback redirection
-        const hostname = window.location.hostname || 'localhost';
-        const backendUrl = import.meta.env.VITE_API_URL || `http://${hostname}:5000`;
-        window.location.href = `${backendUrl}/auth/microsoft`;
-      }
-    } finally {
-      setLoading(false);
+      // Fallback redirection
+      const hostname = window.location.hostname || 'localhost';
+      const backendUrl = import.meta.env.VITE_API_URL || `http://${hostname}:5000`;
+      window.location.href = `${backendUrl}/auth/microsoft`;
     }
   };
 
