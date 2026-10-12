@@ -79,7 +79,8 @@ export const LoginPage = () => {
   const handleMicrosoftSSO = () => {
     setError('');
     const clientId = 'a7bfd8d0-ddff-4fd4-9f94-7e8dbe8ea6c1';
-    const tenantId = '5adb2e4c-71ad-431a-81fa-d48da6fe6b40';
+    // Using 'common' allows both personal Microsoft accounts and work/school accounts
+    const tenantId = 'common';
     const redirectUri = encodeURIComponent(`${window.location.origin}/login`);
 
     // Direct official Microsoft Entra ID Login Redirect
