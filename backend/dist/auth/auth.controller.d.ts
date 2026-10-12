@@ -70,6 +70,19 @@ export declare class AuthController {
         twoFactorSecret: string;
         qrCodeImageDataUrl: any;
     }>;
+    ssoCallbackPost(body: {
+        email: string;
+        name?: string;
+        role?: 'ADMIN' | 'USER';
+    }): Promise<{
+        accessToken: string;
+        user: {
+            id: string;
+            username: string;
+            role: string;
+            displayName: string;
+        };
+    }>;
     microsoftAuth(res: Response, req: ExpressRequest): Promise<void>;
     microsoftAuthCallback(req: ExpressRequest, res: Response, code?: string): Promise<void>;
 }

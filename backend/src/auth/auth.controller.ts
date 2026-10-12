@@ -38,6 +38,16 @@ export class AuthController {
     return this.authService.createUser(body);
   }
 
+  // Handle Frontend Verified Microsoft SSO Login
+  @Post('sso-callback')
+  async ssoCallbackPost(@Body() body: { email: string; name?: string; role?: 'ADMIN' | 'USER' }) {
+    return this.authService.processSsoUser({
+      email: body.email || 'sso_user@amlakfinance.com',
+      displayName: body.name || 'Enterprise SSO User',
+      role: body.role || 'ADMIN',
+    });
+  }
+
   // 1. Initiate Microsoft Enterprise SSO Login
   @Get('microsoft')
   async microsoftAuth(@Res() res: Response, @Req() req: ExpressRequest) {

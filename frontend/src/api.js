@@ -167,6 +167,33 @@ API.interceptors.response.use(
         });
       }
 
+      // 2.1 Microsoft SSO Callback
+      if (url.includes('/auth/sso-callback')) {
+        let body = {};
+        try {
+          body = typeof error.config?.data === 'string' ? JSON.parse(error.config.data) : (error.config?.data || {});
+        } catch (e) {}
+
+        const ssoEmail = body.email || 'alfiya@iqratechnology.com';
+        const ssoName = body.name || 'Alfiya Khan (Microsoft SSO)';
+
+        return Promise.resolve({
+          data: {
+            accessToken: 'amlak_msal_sso_verified_jwt',
+            user: {
+              id: 'ms-sso-user',
+              username: ssoEmail,
+              role: 'ADMIN',
+              displayName: ssoName,
+            }
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+        });
+      }
+
       // 3. Letters Stats & Dashboard Data
       if (url.includes('/letters/stats') || (url.includes('/letters') && method === 'get')) {
         const activeCount = mockLettersStore.filter((l) => l.status === 'ACTIVE').length;

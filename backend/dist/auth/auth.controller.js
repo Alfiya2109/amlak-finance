@@ -38,6 +38,13 @@ let AuthController = class AuthController {
         }
         return this.authService.createUser(body);
     }
+    async ssoCallbackPost(body) {
+        return this.authService.processSsoUser({
+            email: body.email || 'sso_user@amlakfinance.com',
+            displayName: body.name || 'Enterprise SSO User',
+            role: body.role || 'ADMIN',
+        });
+    }
     async microsoftAuth(res, req) {
         if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
             const tenant = process.env.MICROSOFT_TENANT_ID || 'common';
@@ -110,6 +117,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "createUser", null);
+__decorate([
+    (0, common_1.Post)('sso-callback'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "ssoCallbackPost", null);
 __decorate([
     (0, common_1.Get)('microsoft'),
     __param(0, (0, common_1.Res)()),

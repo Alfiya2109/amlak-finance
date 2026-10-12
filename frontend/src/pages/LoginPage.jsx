@@ -5,6 +5,8 @@ import API from '../api';
 import { ShieldCheck, Lock, User, KeyRound, Smartphone, ArrowLeft, QrCode, Sparkles, Building2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
+import { msalInstance, loginRequest } from '../authConfig';
+
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { loginSuccess } = useAuth();
@@ -26,7 +28,7 @@ export const LoginPage = () => {
     const ssoUserRaw = params.get('sso_user');
 
     if (ssoToken) {
-      let ssoUser = { username: 'ahmed.khalid@amlakfinance.com', role: 'ADMIN', name: 'Ahmed Khalid' };
+      let ssoUser = { username: 'alfiya@iqratechnology.com', role: 'ADMIN', name: 'Alfiya (Amlak SSO)' };
       try {
         if (ssoUserRaw) {
           ssoUser = JSON.parse(decodeURIComponent(ssoUserRaw));
@@ -38,28 +40,45 @@ export const LoginPage = () => {
     }
   }, [loginSuccess, navigate]);
 
-  // Microsoft Single Sign-On (SSO) Trigger
-  const handleMicrosoftSSO = () => {
+  // Real Microsoft Single Sign-On (SSO) with Azure Entra ID Popup
+  const handleMicrosoftSSO = async () => {
+    setError('');
     setLoading(true);
-    const isVercelHost = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
-    
-    if (isVercelHost) {
-      // Direct Enterprise SSO simulation on Vercel cloud
-      const ssoUser = {
-        id: 'sso-amlak-1',
-        username: 'ahmed.khalid@amlakfinance.com',
-        role: 'ADMIN',
-        name: 'Ahmed Khalid (Amlak SSO)',
-      };
-      loginSuccess('amlak_sso_verified_token', ssoUser);
-      navigate('/dashboard');
-      return;
-    }
 
-    // Localhost / On-premise backend OAuth redirection
-    const hostname = window.location.hostname || 'localhost';
-    const backendUrl = import.meta.env.VITE_API_URL || `http://${hostname}:5000`;
-    window.location.href = `${backendUrl}/auth/microsoft`;
+    try {
+      // 1. Initialize Microsoft MSAL instance
+      await msalInstance.initialize();
+
+      // 2. Open Official Microsoft Entra ID Login Popup
+      const response = await msalInstance.loginPopup(loginRequest);
+
+      if (response && response.account) {
+        const email = response.account.username;
+        const name = response.account.name || email.split('@')[0];
+
+        // 3. Complete authentication with backend
+        const ssoRes = await API.post('/auth/sso-callback', {
+          email,
+          name,
+          role: 'ADMIN',
+        });
+
+        loginSuccess(ssoRes.data.accessToken, ssoRes.data.user);
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.warn('Microsoft SSO notice:', err);
+      if (err.errorCode === 'user_cancelled') {
+        setError('Microsoft sign-in was cancelled by user.');
+      } else {
+        // Smooth backend fallback redirection
+        const hostname = window.location.hostname || 'localhost';
+        const backendUrl = import.meta.env.VITE_API_URL || `http://${hostname}:5000`;
+        window.location.href = `${backendUrl}/auth/microsoft`;
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Step 1: Initial Login Submit
