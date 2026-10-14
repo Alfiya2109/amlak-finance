@@ -1,7 +1,29 @@
-# VerifyLetter — Amlak Finance PJSC
-## System Requirements, Technology Stack & Technical Rationale
+# 🏦 VerifyLetter — Amlak Finance PJSC
+### UAE Digital Bank Liability Clearance & Tamper-Proof QR Verification Portal
 
-This document provides a comprehensive overview of the **VerifyLetter** application architecture, complete technology stack breakdown, detailed rationale for why each technology was chosen, system requirements, user role permissions, and core feature workflows.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-amlak--finance.vercel.app-0d5c46?style=for-the-badge&logo=vercel&logoColor=white)](https://amlak-finance.vercel.app/login)
+[![React 19](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![NestJS 12](https://img.shields.io/badge/NestJS_12-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma_ORM-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS_4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+> **Live Deployment:** [https://amlak-finance.vercel.app/login](https://amlak-finance.vercel.app/login)  
+> **Repository:** [https://github.com/Alfiya2109/amlak-finance](https://github.com/Alfiya2109/amlak-finance)  
+> **Author:** [Alfiya Khan](https://my-portfolio-one-teal-18.vercel.app/) | [LinkedIn](https://www.linkedin.com/in/alfiya-khan-54133530b/)
+
+---
+
+### 🔑 Demo Login Credentials
+| Role | Username | Password | 2FA TOTP |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin2` | `Admin@123` | Scan dynamic QR code via Microsoft / Google Authenticator |
+| **Staff** | `staff1` | `Staff@123` | Scan dynamic QR code via Microsoft / Google Authenticator |
+
+---
+
+## 📌 Project Overview
+VerifyLetter is an enterprise-grade fintech banking portal engineered for **Amlak Finance PJSC**. It enables authorized corporate bank staff to issue, manage, and verify official liability clearance certificates with cryptographic 2FA TOTP authentication and high-resolution vector QR code stamping directly onto digital PDF certificates. External parties and regulatory authorities can instantly verify certificate validity by scanning the embedded QR code.
 
 ---
 
@@ -138,3 +160,18 @@ npm install
 npm run dev
 ```
 *Frontend runs on `http://localhost:5173` / `http://192.168.0.113:5173`*
+
+---
+
+## 👩‍💻 Author & Connect
+
+* **Developer:** **Alfiya Khan**
+* **Portfolio:** [https://my-portfolio-one-teal-18.vercel.app/](https://my-portfolio-one-teal-18.vercel.app/)
+* **GitHub:** [@Alfiya2109](https://github.com/Alfiya2109)
+* **LinkedIn:** [Alfiya Khan](https://www.linkedin.com/in/alfiya-khan-54133530b/)
+
+---
+
+## 📄 License
+This project is licensed under the MIT License — see the LICENSE file for details.
+
