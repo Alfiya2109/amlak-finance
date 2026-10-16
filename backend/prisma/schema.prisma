@@ -37,3 +37,123 @@ model Letter {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+// ==========================================
+// AMLAK P2P PROCUREMENT & APPROVAL HUB MODELS
+// ==========================================
+
+model Rfp {
+  id               String           @id @default(uuid())
+  rfpNumber        String           @unique
+  title            String
+  department       String           @default("General Operations")
+  category         String           @default("IT & Infrastructure")
+  budget           Float            @default(0.0)
+  currency         String           @default("AED")
+  description      String
+  status           String           @default("DRAFT") // DRAFT, PUBLISHED, EVALUATING, APPROVED, AWARDED, REJECTED
+  technicalWeight  Float            @default(60.0)
+  commercialWeight Float            @default(40.0)
+  deadline         DateTime?
+  createdById      String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  proposals        VendorProposal[]
+  approvalTasks    ApprovalTask[]
+  purchaseOrders   PurchaseOrder[]
+}
+
+model VendorProposal {
+  id               String   @id @default(uuid())
+  rfpId            String
+  rfp              Rfp      @relation(fields: [rfpId], references: [id], onDelete: Cascade)
+  vendorName       String
+  commercialBid    Float
+  technicalScore   Float    @default(0.0) // 0 - 100
+  commercialScore  Float    @default(0.0) // 0 - 100
+  totalScore       Float    @default(0.0) // Formula: (Tech * 0.6) + (Comm * 0.4)
+  proposalDetails  String?
+  isAwarded        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ApprovalTask {
+  id           String         @id @default(uuid())
+  entityType   String         // "RFP", "PO", "INVOICE"
+  entityId     String
+  rfpId        String?
+  rfp          Rfp?           @relation(fields: [rfpId], references: [id], onDelete: SetNull)
+  poId         String?
+  po           PurchaseOrder? @relation(fields: [poId], references: [id], onDelete: SetNull)
+  invoiceId    String?
+  invoice      Invoice?       @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  level        String         @default("L1_DEPT_HEAD") // L1_DEPT_HEAD, L2_FINANCE_DIRECTOR, L3_CEO_BOARD
+  title        String
+  description  String?
+  amount       Float?
+  status       String         @default("PENDING") // PENDING, APPROVED, REJECTED
+  approverRole String         @default("MANAGER")
+  decidedBy    String?
+  comments     String?
+  decidedAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model PurchaseOrder {
+  id            String         @id @default(uuid())
+  poNumber      String         @unique // e.g. "AMLAK-PO-2026-8941" (Oracle EBS simulation)
+  rfpId         String?
+  rfp           Rfp?           @relation(fields: [rfpId], references: [id], onDelete: SetNull)
+  vendorName    String
+  description   String
+  totalAmount   Float
+  currency      String         @default("AED")
+  status        String         @default("ISSUED") // PENDING_APPROVAL, ISSUED, RECEIVED, BILLED, CLOSED, CANCELLED
+  lineItemsJson String?
+  ebsSyncStatus String         @default("SYNCED") // SYNCED, PENDING_SYNC, FAILED
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  approvalTasks ApprovalTask[]
+  goodsReceipts GoodsReceipt[]
+  invoices      Invoice[]
+}
+
+model GoodsReceipt {
+  id                 String        @id @default(uuid())
+  grnNumber          String        @unique // e.g. "GRN-2026-1042"
+  poId               String
+  po                 PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  receivedQuantity   Int           @default(1)
+  deliveryNoteNumber String?
+  receivedDate       DateTime      @default(now())
+  inspectedBy        String        @default("Warehouse Admin")
+  condition          String        @default("PASSED") // PASSED, DAMAGED, DEFECTIVE
+  notes              String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  invoices           Invoice[]
+}
+
+model Invoice {
+  id            String         @id @default(uuid())
+  invoiceNumber String         @unique // e.g. "INV-99214"
+  poId          String
+  po            PurchaseOrder  @relation(fields: [poId], references: [id], onDelete: Cascade)
+  grnId         String?
+  grn           GoodsReceipt?  @relation(fields: [grnId], references: [id], onDelete: SetNull)
+  vendorName    String
+  billedAmount  Float
+  poAmount      Float
+  status        String         @default("PENDING_MATCH") // PENDING_MATCH, MATCHED, DISCREPANCY, APPROVED, PAID
+  matchResult   String?        // JSON summary of 3-Way match
+  paymentDate   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  approvalTasks ApprovalTask[]
+}

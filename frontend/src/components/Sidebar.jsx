@@ -10,6 +10,10 @@ import {
   Sparkles,
   ExternalLink,
   ChevronRight,
+  FileSpreadsheet,
+  Layers,
+  PackageCheck,
+  FileCheck2,
 } from 'lucide-react';
 
 export const Sidebar = ({ children }) => {
@@ -113,6 +117,81 @@ export const Sidebar = ({ children }) => {
                   <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive('/create-user') ? 'opacity-100 translate-x-0.5' : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0'}`} />
                 </Link>
               )}
+            </nav>
+          </div>
+
+          {/* P2P PROCUREMENT & GOVERNANCE SECTION */}
+          <div>
+            <p className="px-2 text-[9px] font-black text-slate-500 tracking-widest uppercase mb-1.5 flex items-center justify-between">
+              <span>Sourcing & P2P</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            </p>
+            <nav className="space-y-1">
+              {/* Sourcing & RFPs */}
+              <Link
+                to="/procurement"
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-extrabold transition-all group ${
+                  isActive('/procurement')
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40 border border-emerald-500/60'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileSpreadsheet className={`w-4 h-4 ${isActive('/procurement') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'}`} />
+                  <span>Sourcing & RFPs</span>
+                </div>
+                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive('/procurement') ? 'opacity-100 translate-x-0.5' : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0'}`} />
+              </Link>
+
+              {/* Central Approval HUB */}
+              <Link
+                to="/approvals"
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-extrabold transition-all group ${
+                  isActive('/approvals')
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40 border border-emerald-500/60'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Layers className={`w-4 h-4 ${isActive('/approvals') ? 'text-white' : 'text-slate-400 group-hover:text-amber-400'}`} />
+                  <span>Approval HUB</span>
+                </div>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  HUB
+                </span>
+              </Link>
+
+              {/* Purchase Orders */}
+              <Link
+                to="/purchase-orders"
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-extrabold transition-all group ${
+                  isActive('/purchase-orders')
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40 border border-emerald-500/60'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <PackageCheck className={`w-4 h-4 ${isActive('/purchase-orders') ? 'text-white' : 'text-slate-400 group-hover:text-teal-400'}`} />
+                  <span>Purchase Orders</span>
+                </div>
+                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive('/purchase-orders') ? 'opacity-100 translate-x-0.5' : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0'}`} />
+              </Link>
+
+              {/* 3-Way Matching */}
+              <Link
+                to="/invoices"
+                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-extrabold transition-all group ${
+                  isActive('/invoices')
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40 border border-emerald-500/60'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileCheck2 className={`w-4 h-4 ${isActive('/invoices') ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'}`} />
+                  <span>3-Way Match</span>
+                </div>
+                <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive('/invoices') ? 'opacity-100 translate-x-0.5' : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0'}`} />
+              </Link>
             </nav>
           </div>
 

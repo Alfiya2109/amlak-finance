@@ -7,6 +7,10 @@ import { DashboardPage } from './pages/DashboardPage';
 import { UploadLetterPage } from './pages/UploadLetterPage';
 import { CreateUserPage } from './pages/CreateUserPage';
 import { VerifyPublicPage } from './pages/VerifyPublicPage';
+import { ProcurementPage } from './pages/ProcurementPage';
+import { ApprovalHubPage } from './pages/ApprovalHubPage';
+import { PurchaseOrdersPage } from './pages/PurchaseOrdersPage';
+import { InvoiceMatchPage } from './pages/InvoiceMatchPage';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin } = useAuth();
@@ -49,6 +53,42 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <UploadLetterPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/procurement"
+            element={
+              <ProtectedRoute>
+                <ProcurementPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/approvals"
+            element={
+              <ProtectedRoute>
+                <ApprovalHubPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/purchase-orders"
+            element={
+              <ProtectedRoute>
+                <PurchaseOrdersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/invoices"
+            element={
+              <ProtectedRoute>
+                <InvoiceMatchPage />
               </ProtectedRoute>
             }
           />

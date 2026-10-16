@@ -100,6 +100,228 @@ const saveStoredLetters = (letters) => {
 
 let mockLettersStore = getStoredLetters();
 
+let mockRfpStore = [
+  {
+    id: 'rfp-demo-1',
+    rfpNumber: 'RFP-2026-001',
+    title: 'Core Banking Cloud Migration & Cybersecurity Audit',
+    department: 'IT & Infrastructure',
+    category: 'IT & Infrastructure',
+    budget: 350000,
+    currency: 'AED',
+    description: 'Procurement of enterprise cloud compliance, threat modeling, and zero-trust infrastructure audit for Amlak Finance.',
+    status: 'EVALUATING',
+    technicalWeight: 60,
+    commercialWeight: 40,
+    deadline: '2026-11-15',
+    createdAt: '2026-10-10T10:00:00.000Z',
+    proposals: [
+      {
+        id: 'prop-1',
+        rfpId: 'rfp-demo-1',
+        vendorName: 'Alpha Cloud Solutions Dubai',
+        commercialBid: 310000,
+        technicalScore: 92,
+        commercialScore: 96.77,
+        totalScore: 93.91,
+        proposalDetails: 'Tier-4 UAE local hosting, ISO 27001 certified, 24/7 SOC integration.',
+        isAwarded: false,
+      },
+      {
+        id: 'prop-2',
+        rfpId: 'rfp-demo-1',
+        vendorName: 'Gulf CyberSec FZ-LLC',
+        commercialBid: 300000,
+        technicalScore: 84,
+        commercialScore: 100,
+        totalScore: 90.40,
+        proposalDetails: 'Comprehensive penetration testing & data classification framework.',
+        isAwarded: false,
+      },
+      {
+        id: 'prop-3',
+        rfpId: 'rfp-demo-1',
+        vendorName: 'Emirates Enterprise Technologies',
+        commercialBid: 340000,
+        technicalScore: 89,
+        commercialScore: 88.24,
+        totalScore: 88.70,
+        proposalDetails: 'Hybrid multi-cloud backup and automated DR disaster recovery.',
+        isAwarded: false,
+      }
+    ],
+    approvalTasks: [],
+    purchaseOrders: []
+  },
+  {
+    id: 'rfp-demo-2',
+    rfpNumber: 'RFP-2026-002',
+    title: 'Corporate Headquarters Smart Facilities Automation',
+    department: 'Facility Management',
+    category: 'Facility Management',
+    budget: 180000,
+    currency: 'AED',
+    description: 'IoT sensor deployment, energy management automation, and smart access badge readers.',
+    status: 'AWARDED',
+    technicalWeight: 60,
+    commercialWeight: 40,
+    deadline: '2026-10-25',
+    createdAt: '2026-10-05T09:30:00.000Z',
+    proposals: [
+      {
+        id: 'prop-4',
+        rfpId: 'rfp-demo-2',
+        vendorName: 'SmartEco Building Systems',
+        commercialBid: 165000,
+        technicalScore: 95,
+        commercialScore: 100,
+        totalScore: 97.00,
+        proposalDetails: 'LEED-certified energy monitoring with real-time BMS API integration.',
+        isAwarded: true,
+      }
+    ],
+    approvalTasks: [],
+    purchaseOrders: []
+  }
+];
+
+let mockPoStore = [
+  {
+    id: 'po-demo-1',
+    poNumber: 'AMLAK-PO-2026-8941',
+    rfpId: 'rfp-demo-2',
+    vendorName: 'SmartEco Building Systems',
+    description: 'Contract award for Corporate Headquarters Smart Facilities Automation',
+    totalAmount: 165000,
+    currency: 'AED',
+    status: 'ISSUED',
+    ebsSyncStatus: 'SYNCED',
+    createdAt: '2026-10-12T11:00:00.000Z',
+  },
+  {
+    id: 'po-demo-2',
+    poNumber: 'AMLAK-PO-2026-7420',
+    vendorName: 'Emirates Telecom (e&)',
+    description: 'Enterprise SD-WAN and Dedicated Fiber Line Renewal',
+    totalAmount: 85000,
+    currency: 'AED',
+    status: 'RECEIVED',
+    ebsSyncStatus: 'SYNCED',
+    createdAt: '2026-10-08T08:15:00.000Z',
+  }
+];
+
+let mockApprovalStore = [
+  {
+    id: 'app-task-1',
+    entityType: 'RFP',
+    entityId: 'rfp-demo-1',
+    rfpId: 'rfp-demo-1',
+    level: 'L2_FINANCE_DIRECTOR',
+    title: 'RFP Approval: Core Banking Cloud Migration (RFP-2026-001)',
+    description: 'Budget requisition AED 350,000 for critical IT compliance and cloud upgrade.',
+    amount: 350000,
+    status: 'PENDING',
+    approverRole: 'FINANCE_DIRECTOR',
+    createdAt: '2026-10-14T10:15:00.000Z',
+  },
+  {
+    id: 'app-task-2',
+    entityType: 'INVOICE',
+    entityId: 'inv-demo-1',
+    invoiceId: 'inv-demo-1',
+    poId: 'po-demo-1',
+    level: 'L2_FINANCE_DIRECTOR',
+    title: 'AP Payment Clearance: INV-AML-8941 (SmartEco Building Systems)',
+    description: '3-Way Match Verified (PO 8941 & GRN 1042). Total AED 165,000.',
+    amount: 165000,
+    status: 'PENDING',
+    approverRole: 'FINANCE_DIRECTOR',
+    createdAt: '2026-10-15T14:30:00.000Z',
+  },
+  {
+    id: 'app-task-3',
+    entityType: 'PO',
+    entityId: 'po-demo-2',
+    poId: 'po-demo-2',
+    level: 'L1_DEPT_HEAD',
+    title: 'PO Clearance: Emirates Telecom Dedicated Fiber (AMLAK-PO-2026-7420)',
+    description: 'Telecom operational expense allocation for Q4 2026.',
+    amount: 85000,
+    status: 'APPROVED',
+    approverRole: 'DEPT_HEAD',
+    decidedBy: 'admin2',
+    comments: 'Approved as per annual telecommunications SLA agreement.',
+    decidedAt: '2026-10-09T10:00:00.000Z',
+    createdAt: '2026-10-08T09:00:00.000Z',
+  }
+];
+
+let mockInvoiceStore = [
+  {
+    id: 'inv-demo-1',
+    invoiceNumber: 'INV-AML-8941',
+    poId: 'po-demo-1',
+    vendorName: 'SmartEco Building Systems',
+    billedAmount: 165000,
+    poAmount: 165000,
+    status: 'MATCHED',
+    po: {
+      poNumber: 'AMLAK-PO-2026-8941',
+      vendorName: 'SmartEco Building Systems',
+      totalAmount: 165000,
+    },
+    grn: {
+      grnNumber: 'GRN-2026-1042',
+      condition: 'PASSED',
+      receivedQuantity: 1,
+      inspectedBy: 'Amlak QA & Asset Control',
+    },
+    matchResult: JSON.stringify({
+      evaluatedAt: '2026-10-15T14:30:00.000Z',
+      matchPassed: true,
+      checks: {
+        priceMatch: { passed: true, poAmount: 165000, billedAmount: 165000, variance: 0 },
+        vendorMatch: { passed: true, vendor: 'SmartEco Building Systems' },
+        receiptMatch: { passed: true, status: 'PASSED', grnNumber: 'GRN-2026-1042' },
+      },
+      summary: '3-Way Matching Successful (PO, GRN & Invoice 100% matched). Cleared for AP disbursement.',
+    }),
+    createdAt: '2026-10-15T14:00:00.000Z',
+  },
+  {
+    id: 'inv-demo-2',
+    invoiceNumber: 'INV-AML-7420',
+    poId: 'po-demo-2',
+    vendorName: 'Emirates Telecom (e&)',
+    billedAmount: 85000,
+    poAmount: 85000,
+    status: 'MATCHED',
+    po: {
+      poNumber: 'AMLAK-PO-2026-7420',
+      vendorName: 'Emirates Telecom (e&)',
+      totalAmount: 85000,
+    },
+    grn: {
+      grnNumber: 'GRN-2026-0985',
+      condition: 'PASSED',
+      receivedQuantity: 1,
+      inspectedBy: 'Amlak Network Admin',
+    },
+    matchResult: JSON.stringify({
+      evaluatedAt: '2026-10-10T11:00:00.000Z',
+      matchPassed: true,
+      checks: {
+        priceMatch: { passed: true, poAmount: 85000, billedAmount: 85000, variance: 0 },
+        vendorMatch: { passed: true, vendor: 'Emirates Telecom (e&)' },
+        receiptMatch: { passed: true, status: 'PASSED', grnNumber: 'GRN-2026-0985' },
+      },
+      summary: '3-Way Matching Successful (PO, GRN & Invoice 100% matched). Cleared for AP disbursement.',
+    }),
+    createdAt: '2026-10-10T10:30:00.000Z',
+  }
+];
+
 // Response Interceptor: Seamless fallback for cloud static deployment (Vercel)
 API.interceptors.response.use(
   (response) => response,
@@ -210,6 +432,237 @@ API.interceptors.response.use(
             letters: mockLettersStore,
             issuers: ['admin2', 'staff1'],
           },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+        });
+      }
+
+      // 3.1 Procurement Stats & RFPs Endpoint
+      if (url.includes('/procurement/stats')) {
+        return Promise.resolve({
+          data: {
+            totalRfps: mockRfpStore.length,
+            activeRfps: mockRfpStore.filter(r => ['PUBLISHED', 'EVALUATING'].includes(r.status)).length,
+            awardedRfps: mockRfpStore.filter(r => r.status === 'AWARDED').length,
+            totalPoVolume: mockPoStore.reduce((sum, p) => sum + (p.totalAmount || 0), 0),
+            totalOrders: mockPoStore.length,
+            pendingApprovals: mockApprovalStore.filter(a => a.status === 'PENDING').length,
+            totalInvoices: mockInvoiceStore.length,
+            matchedInvoices: mockInvoiceStore.filter(i => i.status === 'MATCHED').length,
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+        });
+      }
+
+      if (url.includes('/procurement/rfps') && method === 'get') {
+        const id = url.split('/procurement/rfps/')[1]?.split('?')[0];
+        if (id) {
+          const rfp = mockRfpStore.find(r => r.id === id) || mockRfpStore[0];
+          return Promise.resolve({ data: rfp, status: 200, statusText: 'OK', headers: {}, config: error.config });
+        }
+        return Promise.resolve({ data: mockRfpStore, status: 200, statusText: 'OK', headers: {}, config: error.config });
+      }
+
+      if (url.includes('/procurement/rfps') && method === 'post' && !url.includes('/proposals') && !url.includes('/award')) {
+        let body = {};
+        try {
+          body = typeof error.config?.data === 'string' ? JSON.parse(error.config.data) : (error.config?.data || {});
+        } catch (e) {}
+
+        const newRfp = {
+          id: 'rfp-' + Date.now().toString(36),
+          rfpNumber: `RFP-2026-${String(mockRfpStore.length + 1).padStart(3, '0')}`,
+          title: body.title || 'Enterprise IT Infrastructure Upgrade',
+          department: body.department || 'IT Operations',
+          category: body.category || 'IT & Infrastructure',
+          budget: Number(body.budget) || 250000,
+          currency: 'AED',
+          description: body.description || 'Enterprise tender requisition.',
+          status: 'PUBLISHED',
+          technicalWeight: Number(body.technicalWeight) || 60,
+          commercialWeight: Number(body.commercialWeight) || 40,
+          deadline: body.deadline || new Date(Date.now() + 14 * 86400000).toISOString(),
+          createdAt: new Date().toISOString(),
+          proposals: [],
+          approvalTasks: [],
+          purchaseOrders: [],
+        };
+        mockRfpStore.unshift(newRfp);
+        mockApprovalStore.unshift({
+          id: 'app-' + Date.now().toString(36),
+          entityType: 'RFP',
+          entityId: newRfp.id,
+          rfpId: newRfp.id,
+          level: newRfp.budget > 100000 ? 'L2_FINANCE_DIRECTOR' : 'L1_DEPT_HEAD',
+          title: `RFP Approval: ${newRfp.title} (${newRfp.rfpNumber})`,
+          description: `Budget review for ${newRfp.category} requisition.`,
+          amount: newRfp.budget,
+          status: 'PENDING',
+          approverRole: 'FINANCE_DIRECTOR',
+          createdAt: new Date().toISOString(),
+        });
+
+        return Promise.resolve({ data: newRfp, status: 200, statusText: 'OK', headers: {}, config: error.config });
+      }
+
+      if (url.includes('/proposals') && method === 'post') {
+        const rfpId = url.split('/procurement/rfps/')[1]?.split('/proposals')[0];
+        let body = {};
+        try {
+          body = typeof error.config?.data === 'string' ? JSON.parse(error.config.data) : (error.config?.data || {});
+        } catch (e) {}
+
+        const rfp = mockRfpStore.find(r => r.id === rfpId) || mockRfpStore[0];
+        const bidAmount = Number(body.commercialBid) || 120000;
+        const techScore = Number(body.technicalScore) || 85;
+
+        const allBids = [...rfp.proposals.map(p => p.commercialBid), bidAmount];
+        const lowestBid = Math.min(...allBids);
+
+        const newProposal = {
+          id: 'prop-' + Date.now().toString(36),
+          rfpId: rfp.id,
+          vendorName: body.vendorName || 'Global Systems FZ-LLC',
+          commercialBid: bidAmount,
+          technicalScore: techScore,
+          commercialScore: Number(((lowestBid / bidAmount) * 100).toFixed(2)),
+          totalScore: Number(((techScore * 0.6) + (((lowestBid / bidAmount) * 100) * 0.4)).toFixed(2)),
+          proposalDetails: body.proposalDetails || 'Standard vendor SLA proposal.',
+          isAwarded: false,
+          createdAt: new Date().toISOString(),
+        };
+
+        rfp.proposals.push(newProposal);
+        rfp.status = 'EVALUATING';
+        return Promise.resolve({ data: rfp, status: 200, statusText: 'OK', headers: {}, config: error.config });
+      }
+
+      if (url.includes('/award') && method === 'post') {
+        const rfpId = url.split('/procurement/rfps/')[1]?.split('/award')[0];
+        let body = {};
+        try {
+          body = typeof error.config?.data === 'string' ? JSON.parse(error.config.data) : (error.config?.data || {});
+        } catch (e) {}
+
+        const rfp = mockRfpStore.find(r => r.id === rfpId) || mockRfpStore[0];
+        const proposal = rfp.proposals.find(p => p.id === body.proposalId) || rfp.proposals[0];
+        proposal.isAwarded = true;
+        rfp.status = 'AWARDED';
+
+        const poSeq = Math.floor(1000 + Math.random() * 9000);
+        const po = {
+          id: 'po-' + Date.now().toString(36),
+          poNumber: `AMLAK-PO-2026-${poSeq}`,
+          rfpId: rfp.id,
+          vendorName: proposal.vendorName,
+          description: `Contract award for ${rfp.title} (${rfp.rfpNumber})`,
+          totalAmount: proposal.commercialBid,
+          currency: 'AED',
+          status: 'ISSUED',
+          ebsSyncStatus: 'SYNCED',
+          createdAt: new Date().toISOString(),
+        };
+        mockPoStore.unshift(po);
+
+        const invoice = {
+          id: 'inv-' + Date.now().toString(36),
+          invoiceNumber: `INV-AML-${poSeq}`,
+          poId: po.id,
+          vendorName: proposal.vendorName,
+          billedAmount: proposal.commercialBid,
+          poAmount: proposal.commercialBid,
+          status: 'PENDING_MATCH',
+          po,
+          grn: {
+            grnNumber: `GRN-2026-${poSeq}`,
+            condition: 'PASSED',
+            receivedQuantity: 1,
+            inspectedBy: 'Amlak QA & Asset Control',
+          },
+          createdAt: new Date().toISOString(),
+        };
+        mockInvoiceStore.unshift(invoice);
+
+        return Promise.resolve({
+          data: { message: `Contract awarded to ${proposal.vendorName}`, po, rfp },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+        });
+      }
+
+      // 3.2 Orders Endpoint
+      if (url.includes('/procurement/orders')) {
+        return Promise.resolve({ data: mockPoStore, status: 200, statusText: 'OK', headers: {}, config: error.config });
+      }
+
+      // 3.3 Approvals Hub Endpoint
+      if (url.includes('/approvals/pending')) {
+        return Promise.resolve({
+          data: mockApprovalStore.filter(a => a.status === 'PENDING'),
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+        });
+      }
+
+      if (url.includes('/approvals/history')) {
+        return Promise.resolve({ data: mockApprovalStore, status: 200, statusText: 'OK', headers: {}, config: error.config });
+      }
+
+      if (url.includes('/approvals/') && url.includes('/action')) {
+        const id = url.split('/approvals/')[1]?.split('/action')[0];
+        let body = {};
+        try {
+          body = typeof error.config?.data === 'string' ? JSON.parse(error.config.data) : (error.config?.data || {});
+        } catch (e) {}
+
+        const task = mockApprovalStore.find(a => a.id === id);
+        if (task) {
+          task.status = body.action || 'APPROVED';
+          task.comments = body.comments || `Approved via Central Approval HUB`;
+          task.decidedBy = 'Enterprise Approver';
+          task.decidedAt = new Date().toISOString();
+        }
+
+        return Promise.resolve({
+          data: { message: `Task ${body.action || 'APPROVED'} successfully`, task },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+        });
+      }
+
+      // 3.4 Invoices & 3-Way Match Endpoint
+      if (url.includes('/invoices') && method === 'get') {
+        return Promise.resolve({ data: mockInvoiceStore, status: 200, statusText: 'OK', headers: {}, config: error.config });
+      }
+
+      if (url.includes('/invoices/') && url.includes('/match')) {
+        const id = url.split('/invoices/')[1]?.split('/match')[0];
+        const invoice = mockInvoiceStore.find(i => i.id === id) || mockInvoiceStore[0];
+        invoice.status = 'MATCHED';
+        invoice.matchResult = JSON.stringify({
+          evaluatedAt: new Date().toISOString(),
+          matchPassed: true,
+          checks: {
+            priceMatch: { passed: true, poAmount: invoice.poAmount, billedAmount: invoice.billedAmount, variance: 0 },
+            vendorMatch: { passed: true, vendor: invoice.vendorName },
+            receiptMatch: { passed: true, status: 'PASSED' },
+          },
+          summary: '3-Way Matching Successful (PO, GRN & Invoice 100% matched). Cleared for AP disbursement.',
+        });
+
+        return Promise.resolve({
+          data: { message: '3-Way Match Passed!', invoice },
           status: 200,
           statusText: 'OK',
           headers: {},

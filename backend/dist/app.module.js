@@ -11,12 +11,22 @@ const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("./prisma/prisma.module");
 const auth_module_1 = require("./auth/auth.module");
 const letters_module_1 = require("./letters/letters.module");
+const procurement_module_1 = require("./procurement/procurement.module");
+const approvals_module_1 = require("./approvals/approvals.module");
+const invoices_module_1 = require("./invoices/invoices.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, auth_module_1.AuthModule, letters_module_1.LettersModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            auth_module_1.AuthModule,
+            letters_module_1.LettersModule,
+            procurement_module_1.ProcurementModule,
+            approvals_module_1.ApprovalsModule,
+            invoices_module_1.InvoicesModule,
+        ],
         controllers: [],
         providers: [],
     })
